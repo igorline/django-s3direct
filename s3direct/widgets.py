@@ -3,6 +3,7 @@ from django.forms import widgets
 from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from .compat import u
 
 
 HTML = (
@@ -49,9 +50,9 @@ class S3DirectEditor(widgets.TextInput):
         file_name = os.path.basename(file_url)
 
         output = HTML.format(policy_url=policy_url,
-                             file_url=file_url,
-                             file_name=file_name,
+                             file_url=u(file_url),
+                             file_name=u(file_name),
                              element_id=element_id,
-                             name=name)
+                             name=u(name))
 
         return mark_safe(output)
