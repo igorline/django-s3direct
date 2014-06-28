@@ -1,16 +1,20 @@
+from datetime import datetime
 import hashlib
 import uuid
 import hmac
 import json
 import os
+import logging
 from base64 import b64encode
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
-from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+
+
+logger = logging.getLogger(__name__)
 
 
 @require_POST
@@ -29,6 +33,7 @@ def get_upload_params(request, upload_to):
                         if not wildcard == content_type:
                             raise PermissionDenied()
             data = create_upload_data(content_type, source_filename, dest.get('path'))
+            logger.debug("S3Widget upload permission for %s of type %s" % (source_filename, content_type))
             return HttpResponse(json.dumps(data), content_type="application/json")
     raise PermissionDenied()
 
@@ -37,7 +42,7 @@ def create_upload_data(content_type, source_filename, path):
     access_key = settings.AWS_ACCESS_KEY_ID
     secret_access_key = settings.AWS_SECRET_ACCESS_KEY
     bucket = settings.AWS_STORAGE_BUCKET_NAME
-    expires = "%sZ" % (timezone.now() + settings.S3DIRECT_EXPIRATION).isoformat()
+    expires = (datetime.now() + settings.S3DIRECT_EXPIRATION).strftime('%Y-%m-%dT%H:%M:%S.000Z')
     policy_object = json.dumps({
         "expiration": expires,
         "conditions": [
@@ -48,8 +53,6 @@ def create_upload_data(content_type, source_filename, path):
             {"success_action_status": "201"}
         ]
     })
-
-    print(policy_object)
 
     policy = b64encode(policy_object.replace('\n', '').replace('\r', ''))
     signature = hmac.new(secret_access_key, policy, hashlib.sha1).digest()
