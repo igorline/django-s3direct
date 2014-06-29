@@ -70,7 +70,7 @@ def create_upload_data(content_type, source_filename, path):
         "signature": signature_b64,
         "key": key,
         "AWSAccessKeyId": access_key,
-        "form_action": settings.MEDIA_URL,
+        "form_action": "https://%s/%s" % (settings.S3DIRECT_ENDPOINT, settings.AWS_STORAGE_BUCKET_NAME),
         "success_action_status": "201",
         "acl": "public-read",
         "Content-Type": content_type
