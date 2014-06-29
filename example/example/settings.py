@@ -57,9 +57,8 @@ MEDIA_URL = '/media/'
 
 AWS_SECRET_ACCESS_KEY = ''
 AWS_ACCESS_KEY_ID = ''
-AWS_STORAGE_BUCKET_NAME = 'myBucket'
+AWS_STORAGE_BUCKET_NAME = ''
 S3DIRECT_UNIQUE_RENAME = False
 S3DIRECT_DESTINATIONS = {
-    'foo': ('path/to/dir', lambda u: u.is_authenticated()),
-    'bar': ('path/to/dir', lambda u: u.is_staff)
+    'foo': ('path/foo', lambda u: u.is_authenticated(), 'image/jpg', 'image/png'),
 }
